@@ -1,54 +1,56 @@
 from socket import *
 
+def smtp_client(port=1025, server='127.0.0.1'):
+    message = "\r\n Hello, this is my email message."
+    end_message = "\r\n.\r\n"
 
-def smtp_client(port=1025, mailserver='127.0.0.1'):
-    msg = "\r\n My message"
-    endmsg = "\r\n.\r\n"
+    # Set up socket and connect to server
+    s = socket(AF_INET, SOCK_STREAM)
+    s.connect((server, port))
 
-    # Choose a mail server (e.g. Google mail server) if you want to verify the script beyond GradeScope
+    response = s.recv(1024).decode()
+    if response[:3] != '220':
+        print('Did not get 220 on connection')
 
-    # Create socket called clientSocket and establish a TCP connection with mailserver and port
+    # Say hello to server
+    s.send('HELO student\r\n'.encode())
+    response = s.recv(1024).decode()
+    if response[:3] != '250':
+        print('HELO failed')
 
-    # Fill in start
-    # Fill in end
+    # Tell server who the email is from
+    s.send('MAIL FROM:<aj2494@nyu.edu>\r\n'.encode())
+    response = s.recv(1024).decode()
+    if response[:3] != '250':
+        print('MAIL FROM rejected')
 
-    recv = clientSocket.recv(1024).decode()
-    #print(recv) #You can use these print statement to validate return codes from the server.
-    #if recv[:3] != '220':
-    #    print('220 reply not received from server.')
+    # Tell server who the email is to
+    s.send('RCPT TO:<anikajishan18@gmail.com>\r\n'.encode())
+    response = s.recv(1024).decode()
+    if response[:3] != '250':
+        print('RCPT TO rejected')
 
-    # Send HELO command and print server response.
-    heloCommand = 'HELO Alice\r\n'
-    clientSocket.send(heloCommand.encode())
-    recv1 = clientSocket.recv(1024).decode()
-    #print(recv1) 
-    #if recv1[:3] != '250':
-    #    print('250 reply not received from server.')
+    # Start data section
+    s.send('DATA\r\n'.encode())
+    response = s.recv(1024).decode()
+    if response[:3] != '354':
+        print('DATA command not accepted')
 
-    # Send MAIL FROM command and handle server response.
-    # Fill in start
-    # Fill in end
+    # Send the message itself
+    s.send(message.encode())
+    s.send(end_message.encode())
 
-    # Send RCPT TO command and handle server response.
-    # Fill in start
-    # Fill in end
+    response = s.recv(1024).decode()
+    if response[:3] != '250':
+        print('Message not accepted')
 
-    # Send DATA command and handle server response.
-    # Fill in start
-    # Fill in end
+    # Close the connection politely
+    s.send('QUIT\r\n'.encode())
+    response = s.recv(1024).decode()
+    if response[:3] != '221':
+        print('QUIT failed')
 
-    # Send message data.
-    # Fill in start
-    # Fill in end
-
-    # Message ends with a single period, send message end and handle server response.
-    # Fill in start
-    # Fill in end
-
-    # Send QUIT command and handle server response.
-    # Fill in start
-    # Fill in end
-
+    s.close()
 
 if __name__ == '__main__':
-    smtp_client(1025, '127.0.0.1')
+    smtp_client()
