@@ -44,7 +44,7 @@ def smtp_client(port=1025, server='127.0.0.1'):
     if response[:3] != '250':
         print('Message not accepted')
 
-    # Close the connection politely
+    # Close the connection 
     s.send('QUIT\r\n'.encode())
     response = s.recv(1024).decode()
     if response[:3] != '221':
